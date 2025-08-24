@@ -2,6 +2,16 @@
 namespace brmgina\WordPress\GetFromServer;
 use WP_Error;
 
+/**
+ * Enhanced Get From Server Plugin
+ * 
+ * This plugin allows importing files from the server filesystem into WordPress media library.
+ * Enhanced with support for additional file types including ISO, ZIP, RAR, 7Z, TAR, GZ, and BZ2.
+ * 
+ * @version 1.0.1
+ * @author Eng. A7meD KaMeL
+ */
+
 const COOKIE = 'frmsvr_path';
 
 class Plugin {
@@ -16,6 +26,7 @@ class Plugin {
 	protected function __construct() {
 		add_action( 'admin_init', [ $this, 'admin_init' ] );
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
+		add_filter( 'upload_mimes', [ $this, 'add_iso_mime_type' ] );
 	}
 
 	function admin_init() {
@@ -183,6 +194,33 @@ class Plugin {
 		$type = $wp_filetype['type'];
 		$ext  = $wp_filetype['ext'];
 		
+		// إضافة دعم لملفات إضافية
+		if ( !$type ) {
+			switch ( $ext ) {
+				case 'iso':
+					$type = 'application/x-iso9660-image';
+					break;
+				case 'zip':
+					$type = 'application/zip';
+					break;
+				case 'rar':
+					$type = 'application/x-rar-compressed';
+					break;
+				case '7z':
+					$type = 'application/x-7z-compressed';
+					break;
+				case 'tar':
+					$type = 'application/x-tar';
+					break;
+				case 'gz':
+					$type = 'application/gzip';
+					break;
+				case 'bz2':
+					$type = 'application/x-bzip2';
+					break;
+			}
+		}
+		
 		// التحقق من نوع MIME الفعلي للملف
 		$actual_mime = $this->get_actual_mime_type( $file );
 		if ( $actual_mime && $type && $actual_mime !== $type ) {
@@ -340,6 +378,27 @@ class Plugin {
 		}
 
 		return $id;
+	}
+
+	/**
+	 * Add additional MIME types to WordPress allowed types
+	 * 
+	 * @param array $mimes Array of allowed MIME types
+	 * @return array Modified array of MIME types
+	 */
+	function add_iso_mime_type( $mimes ) {
+		// إضافة دعم لملفات ISO
+		$mimes['iso'] = 'application/x-iso9660-image';
+		
+		// إضافة دعم لملفات أخرى شائعة
+		$mimes['zip'] = 'application/zip';
+		$mimes['rar'] = 'application/x-rar-compressed';
+		$mimes['7z'] = 'application/x-7z-compressed';
+		$mimes['tar'] = 'application/x-tar';
+		$mimes['gz'] = 'application/gzip';
+		$mimes['bz2'] = 'application/x-bzip2';
+		
+		return $mimes;
 	}
 
 	/**
@@ -514,7 +573,38 @@ class Plugin {
 			return is_file( $node );
 		} ) );
 		array_walk( $files, function( &$data, $path ) use( $root, $get_root_relative_path ) {
-			$importable = ( false !== wp_check_filetype( $path )['type'] || current_user_can( 'unfiltered_upload' ) );
+			$wp_filetype = wp_check_filetype( $path );
+			$type = $wp_filetype['type'];
+			$ext = $wp_filetype['ext'];
+			
+			// إضافة دعم لملفات إضافية في واجهة المستخدم
+			if ( !$type ) {
+				switch ( $ext ) {
+					case 'iso':
+						$type = 'application/x-iso9660-image';
+						break;
+					case 'zip':
+						$type = 'application/zip';
+						break;
+					case 'rar':
+						$type = 'application/x-rar-compressed';
+						break;
+					case '7z':
+						$type = 'application/x-7z-compressed';
+						break;
+					case 'tar':
+						$type = 'application/x-tar';
+						break;
+					case 'gz':
+						$type = 'application/gzip';
+						break;
+					case 'bz2':
+						$type = 'application/x-bzip2';
+						break;
+				}
+			}
+			
+			$importable = ( false !== $type || current_user_can( 'unfiltered_upload' ) );
 			$readable   = is_readable( $path );
 
 			$data = [
@@ -572,7 +662,7 @@ class Plugin {
 					foreach ( $files as $file ) {
 						$error_str = '';
 						if ( 'doesnt-meet-guidelines' === $file['error'] ) {
-							$error_str = __( 'Sorry, this file type is not permitted for security reasons. Please see the FAQ.', 'get-from-server' );
+							$error_str = __( 'Sorry, this file type is not permitted for security reasons. If you need to import this file type, please contact your administrator.', 'get-from-server' );
 						} else if ( 'unreadable' === $file['error'] ) {
 							$error_str = __( 'Sorry, but this file is unreadable by your Webserver. Perhaps check your File Permissions?', 'get-from-server' );
 						}

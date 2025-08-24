@@ -5,7 +5,33 @@
 التنسيق مبني على [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)،
 وهذا المشروع يتبع [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-XX
+## [1.0.1] - 2025-01-27
+
+### Added
+- دعم محسن لأنواع الملفات الإضافية:
+  - ملفات ISO (application/x-iso9660-image)
+  - ملفات ZIP (application/zip)
+  - ملفات RAR (application/x-rar-compressed)
+  - ملفات 7Z (application/x-7z-compressed)
+  - ملفات TAR (application/x-tar)
+  - ملفات GZ (application/gzip)
+  - ملفات BZ2 (application/x-bzip2)
+- فلتر `upload_mimes` لإضافة أنواع MIME الجديدة
+- تحسين رسائل الخطأ لتكون أكثر وضوحاً
+
+### Fixed
+- إصلاح مشكلة عدم إمكانية استيراد ملفات ISO
+- إزالة الخلفية الحمراء من ملفات ISO والملفات المدعومة الأخرى
+- تحسين التحقق من نوع الملف في واجهة المستخدم
+
+### Technical
+- إضافة دالة `add_iso_mime_type()` لإضافة أنواع MIME الجديدة
+- تحسين التحقق من نوع الملف في `handle_import_file()`
+- تحسين التحقق من نوع الملف في `main_content()`
+
+---
+
+## [1.0.0] - 2025-01-27
 
 ### Added
 - إضافة WordPress Plugin جديدة لاستيراد الملفات من الخادم

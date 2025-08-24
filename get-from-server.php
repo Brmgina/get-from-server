@@ -2,7 +2,7 @@
 namespace brmgina\WordPress\GetFromServer;
 /*
  * Plugin Name: Get From Server
- * Version: 1.0.0
+ * Version: 1.0.1
  * Plugin URI: https://brmgina.net/
  * Description: Plugin to allow the Media Manager to get files from the webservers filesystem.
  * Author: Eng. A7meD KaMeL
@@ -16,7 +16,7 @@ if ( !is_admin() ) {
 
 const MIN_WP  = '6.0';
 const MIN_PHP = '8.0';
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 
 // Dynamic constants must be define()'d.
 define( __NAMESPACE__ . '\PLUGIN', plugin_basename( __FILE__ ) );
