@@ -3,11 +3,12 @@ namespace brmgina\WordPress\GetFromServer;
 /*
  * Plugin Name: Get From Server
  * Version: 1.0.1
- * Plugin URI: https://brmgina.net/
+ * Plugin URI: https://github.com/Brmgina/get-from-server/
  * Description: Plugin to allow the Media Manager to get files from the webservers filesystem.
  * Author: Eng. A7meD KaMeL
  * Author URI: https://a-kamel.com/
  * Text Domain: get-from-server
+ * Update URI: https://github.com/Brmgina/get-from-server/releases/latest
  */
 
 if ( !is_admin() ) {

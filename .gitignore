@@ -1,16 +1,17 @@
-# WordPress Plugin Specific
+# WordPress Plugin Development
+.DS_Store
+Thumbs.db
 *.log
 *.tmp
-*.temp
+*.bak
 
-# IDE and Editor Files
+# IDE Files
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS Generated Files
+# OS Files
 .DS_Store
 .DS_Store?
 ._*
@@ -20,43 +21,46 @@ ehthumbs.db
 Thumbs.db
 
 # Backup Files
-*.bak
 *.backup
 *.old
+*.orig
 
-# Security Files
-security_test.php
+# Temporary Files
+*.tmp
+*.temp
+*.cache
 
 # Development Files
 node_modules/
 vendor/
 composer.lock
 package-lock.json
+yarn.lock
 
 # Build Files
-*.min.js
-*.min.css
 dist/
 build/
+*.zip
+*.tar.gz
 
-# WordPress Core (if accidentally included)
-wp-admin/
-wp-includes/
-wp-content/uploads/
-wp-config.php
-
-# Testing
-phpunit.xml
-tests/
-coverage/
-
-# Documentation Build
-docs/_build/
-docs/_static/
-
-# Local Development
+# Environment Files
 .env
 .env.local
-.env.development
-.env.test
 .env.production
+
+# WordPress Specific
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/uploads/
+wp-content/mu-plugins/
+wp-content/wp-cache-config.php
+wp-content/plugins/hello.php
+
+# Security
+.htaccess
+robots.txt

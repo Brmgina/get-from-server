@@ -27,6 +27,10 @@ class Plugin {
 		add_action( 'admin_init', [ $this, 'admin_init' ] );
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 		add_filter( 'upload_mimes', [ $this, 'add_iso_mime_type' ] );
+		
+		// إضافة دعم التحديث التلقائي من GitHub
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_for_plugin_update' ] );
+		add_filter( 'plugins_api', [ $this, 'plugin_api_call' ], 10, 3 );
 	}
 
 	function admin_init() {
@@ -766,6 +770,144 @@ Thanks! Eng. A7meD KaMeL.', 'get-from-server' );
 				'To make this warning go away, empty the "frmsvr_root" option on <a href="options.php#frmsvr_root">options.php</a>.'
 			);
 		}
+	}
+
+	/**
+	 * Check for plugin updates from GitHub
+	 * 
+	 * @param object $transient Update plugins transient
+	 * @return object Modified transient
+	 */
+	function check_for_plugin_update( $transient ) {
+		if ( empty( $transient->checked ) ) {
+			return $transient;
+		}
+
+		// GitHub repository information
+		$plugin_slug = basename( dirname( __FILE__ ) );
+		$github_repo = 'Brmgina/get-from-server';
+		$github_api_url = "https://api.github.com/repos/{$github_repo}/releases/latest";
+
+		// Get latest release from GitHub
+		$response = wp_remote_get( $github_api_url, array(
+			'timeout' => 15,
+			'headers' => array(
+				'Accept' => 'application/vnd.github.v3+json',
+				'User-Agent' => 'WordPress/' . get_bloginfo( 'version' )
+			)
+		) );
+
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return $transient;
+		}
+
+		$release_data = json_decode( wp_remote_retrieve_body( $response ) );
+		
+		if ( ! $release_data || ! isset( $release_data->tag_name ) ) {
+			return $transient;
+		}
+
+		// Remove 'v' prefix if present
+		$latest_version = ltrim( $release_data->tag_name, 'v' );
+		$current_version = VERSION;
+
+		// Check if update is needed
+		if ( version_compare( $latest_version, $current_version, '>' ) ) {
+			$plugin_file = plugin_basename( __FILE__ );
+			
+			$transient->response[ $plugin_file ] = (object) array(
+				'slug' => $plugin_slug,
+				'new_version' => $latest_version,
+				'url' => "https://github.com/{$github_repo}",
+				'package' => $release_data->zipball_url,
+				'requires' => '6.0',
+				'requires_php' => '8.0',
+				'tested' => '6.4',
+				'last_updated' => $release_data->published_at,
+				'sections' => array(
+					'description' => $release_data->body,
+					'changelog' => $release_data->body
+				)
+			);
+		}
+
+		return $transient;
+	}
+
+	/**
+	 * Plugin API call for update information
+	 * 
+	 * @param bool|object $result Result object
+	 * @param string $action Action being performed
+	 * @param object $args Arguments
+	 * @return object|bool Result object or false
+	 */
+	function plugin_api_call( $result, $action, $args ) {
+		if ( $action !== 'plugin_information' ) {
+			return $result;
+		}
+
+		$plugin_slug = basename( dirname( __FILE__ ) );
+		
+		if ( $args->slug !== $plugin_slug ) {
+			return $result;
+		}
+
+		// GitHub repository information
+		$github_repo = 'Brmgina/get-from-server';
+		$github_api_url = "https://api.github.com/repos/{$github_repo}/releases/latest";
+
+		$response = wp_remote_get( $github_api_url, array(
+			'timeout' => 15,
+			'headers' => array(
+				'Accept' => 'application/vnd.github.v3+json',
+				'User-Agent' => 'WordPress/' . get_bloginfo( 'version' )
+			)
+		) );
+
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return $result;
+		}
+
+		$release_data = json_decode( wp_remote_retrieve_body( $response ) );
+		
+		if ( ! $release_data ) {
+			return $result;
+		}
+
+		$latest_version = ltrim( $release_data->tag_name, 'v' );
+
+		$result = (object) array(
+			'name' => 'Get From Server',
+			'slug' => $plugin_slug,
+			'version' => $latest_version,
+			'author' => 'Eng. A7meD KaMeL',
+			'author_profile' => 'https://a-kamel.com/',
+			'last_updated' => $release_data->published_at,
+			'requires' => '6.0',
+			'requires_php' => '8.0',
+			'tested' => '6.4',
+			'compatibility' => array(),
+			'rating' => 0,
+			'ratings' => array(),
+			'num_ratings' => 0,
+			'downloaded' => 0,
+			'active_installs' => 0,
+			'short_description' => 'Plugin to allow the Media Manager to get files from the webservers filesystem.',
+			'sections' => array(
+				'description' => $release_data->body,
+				'installation' => '1. انسخ جميع ملفات الإضافة إلى مجلد `wp-content/plugins/get-from-server/`<br>2. فعّل الإضافة من لوحة التحكم<br>3. اذهب إلى Media → Get From Server',
+				'changelog' => $release_data->body,
+				'screenshots' => '',
+				'faq' => '',
+				'other_notes' => ''
+			),
+			'download_link' => $release_data->zipball_url,
+			'homepage' => "https://github.com/{$github_repo}",
+			'support' => "https://github.com/{$github_repo}/issues"
+		);
+
+		return $result;
 	}
 
 }
