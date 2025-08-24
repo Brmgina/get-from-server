@@ -1,0 +1,62 @@
+# WordPress Plugin Specific
+*.log
+*.tmp
+*.temp
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup Files
+*.bak
+*.backup
+*.old
+
+# Security Files
+security_test.php
+
+# Development Files
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# Build Files
+*.min.js
+*.min.css
+dist/
+build/
+
+# WordPress Core (if accidentally included)
+wp-admin/
+wp-includes/
+wp-content/uploads/
+wp-config.php
+
+# Testing
+phpunit.xml
+tests/
+coverage/
+
+# Documentation Build
+docs/_build/
+docs/_static/
+
+# Local Development
+.env
+.env.local
+.env.development
+.env.test
+.env.production
